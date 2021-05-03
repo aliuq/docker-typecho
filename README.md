@@ -72,8 +72,10 @@ docker run -d --name typecho \
 ```bash
 # 进入opt目录
 cd /opt
+
 # 启用地址重新功能rewrite
 cp apache2/mods-available/rewrite.load apache2/mods-enabled/
+
 # 修改apache2/apache2.conf
 # 添加以下语句
 RewriteEngine On
@@ -85,6 +87,7 @@ RewriteEngine On
 	RewriteRule ^(.*)$ index.php [L,E=PATH_INFO:$1]
 	Require all granted
 </Directory>
+
 # 重启docker容器typecho
 docker restart typecho
 ```
@@ -94,9 +97,11 @@ docker restart typecho
 ```bash
 # 进入opt目录
 cd /opt
+
 # 修改apache2/sites-enabled/000-default.conf
 # 在ServerAdmin下面增加一行，将www.example.com改为自己的域名
 ServerName www.example.com
+
 # 重启typecho容器
 docker restart typecho
 ```
@@ -106,21 +111,26 @@ docker restart typecho
 ```bash
 # 进入opt目录
 cd /opt
+
 # 启用SSL功能
 cp apache2/mods-available/ssl.* apache2/mods-enabled/ && \
 cp apache2/mods-available/socache_shmcb.load apache2/mods-enabled/ && \
 cp apache2/sites-available/default-ssl.conf apache2/sites-enabled/
+
 # 删除原有镜像
 docker rm typecho -f
+
 # 暴露443端口
 docker run -d --name typecho \
 -p 80:80 -p 443:443 \
 -v /opt/typecho:/var/www/html \
 -v /opt/apache2:/etc/apache2 linkaliu/docker-typecho
+
 # 将证书上传到apache2文件夹cert内
 # 修改apache2/sites-enabled/default-ssl.conf
 # 在ServerAdmin下面添加一行，将www.example.com改为自己的域名
 ServerName www.example.com
+
 # 修改对应的key，使用自己的证书
 SSLCertificateFile	cert/5580757_blog.bilishare.com_public.crt
 SSLCertificateKeyFile cert/5580757_blog.bilishare.com.key
@@ -132,6 +142,7 @@ SSLCertificateChainFile cert/5580757_blog.bilishare.com_chain.crt
 ```bash
 # 进入opt目录
 cd /opt
+
 # 修改apache2/sites-enabled/000-default.conf
 # 添加以下内容
 RewriteCond %{SERVER_PORT} !^443$
