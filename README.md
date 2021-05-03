@@ -11,8 +11,8 @@
 + Centos：`yum install docker -y`
 
 + 其他：
-    - `curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun` 
-    - `curl -sSL https://get.daocloud.io/docker | sh`
+  - `curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun` 
+  - `curl -sSL https://get.daocloud.io/docker | sh`
 
 ## 用法
 
@@ -37,7 +37,10 @@ docker rm temp_typecho -f
 
 # Setup
 # 兼容Debian系统，使用绝对路径/opt/typecho和/opt/apache2
-docker run -d --name typecho -p 80:80 -p 443:443 -v /opt/typecho:/var/www/html -v /opt/apache2:/etc/apache2 linkaliu/docker-typecho
+docker run -d --name typecho \
+-p 80:80 -p 443:443 \
+-v /opt/typecho:/var/www/html \
+-v /opt/apache2:/etc/apache2 linkaliu/docker-typecho
 ```
 
 访问 **` http://<IP Address>:8080 `**
@@ -50,15 +53,13 @@ docker run -d --name typecho -p 80:80 -p 443:443 -v /opt/typecho:/var/www/html -
 
 常见错误：
 
-错误：**Warning: Cannot modify header information - headers already sent by (output started at /var/www/html/install.php:202) in /var/www/html/var/Typecho/Cookie.php on line 102** 或 **Warning: Cannot modify header information - headers already sent by (output started at /var/www/html/install.php:202) in /var/www/html/install.php on line 559**
+1. 错误：*Warning: Cannot modify header information - headers already sent by (output started at /var/www/html/install.php:202) in /var/www/html/var/Typecho/Cookie.php on line 102** 或 **Warning: Cannot modify header information - headers already sent by (output started at /var/www/html/install.php:202) in /var/www/html/install.php on line 559*
 
-解决方案：云数据库问题，在**typecho/install.php** **56**行添加**ob_start();**
+   解决方案：云数据库问题，在**typecho/install.php** **56**行添加**ob_start();**
 
+2. 错误：*安装程序捕捉到以下错误: "SQLSTATE[HY000]: General error: 3161 Storage engine MyISAM is disabled (Table creation is disallowed).". 程序被终止, 请检查您的配置信息.*
 
-
-错误：**安装程序捕捉到以下错误: "SQLSTATE[HY000]: General error: 3161 Storage engine MyISAM is disabled (Table creation is disallowed).". 程序被终止, 请检查您的配置信息.**
-
-解决方案：因为mysql当前版本不支持MyISAM引擎，将**typecho/install/Mysql.sql**中的**MyISAM**修改为**INNODB**，刷新页面
+   解决方案：因为mysql当前版本不支持MyISAM引擎，将**typecho/install/Mysql.sql**中的**MyISAM**修改为**INNODB**，刷新页面
 
 
 
@@ -112,7 +113,10 @@ cp apache2/sites-available/default-ssl.conf apache2/sites-enabled/
 # 删除原有镜像
 docker rm typecho -f
 # 暴露443端口
-docker run -d --name typecho -p 80:80 -p 443:443 -v /opt/typecho:/var/www/html -v /opt/apache2:/etc/apache2 linkaliu/docker-typecho
+docker run -d --name typecho \
+-p 80:80 -p 443:443 \
+-v /opt/typecho:/var/www/html \
+-v /opt/apache2:/etc/apache2 linkaliu/docker-typecho
 # 将证书上传到apache2文件夹cert内
 # 修改apache2/sites-enabled/default-ssl.conf
 # 在ServerAdmin下面添加一行，将www.example.com改为自己的域名
@@ -133,4 +137,3 @@ cd /opt
 RewriteCond %{SERVER_PORT} !^443$
 RewriteRule ^/?(.*)$ https://%{SERVER_NAME}/$1 [L,R]
 ```
-
