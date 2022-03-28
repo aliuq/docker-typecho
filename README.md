@@ -1,49 +1,62 @@
 # docker-typecho
 
+Docker 环境下安装部署 [Typecho](https://typecho.org/) 博客模板
+
 ## 容器环境
 
 + OS：Debian
 + PHP：7.4.16
 + Apache：2.4.38
 
-**docker安装**
+## docker安装
 
 + Centos：`yum install docker -y`
 
 + 其他：
-  - `curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun` 
-  - `curl -sSL https://get.daocloud.io/docker | sh`
+  + `curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun`
+  + `curl -sSL https://get.daocloud.io/docker | sh`
 
-## 用法
+## Usage
+
+拉取镜像
 
 ```bash
-# Pull image
 docker pull linkaliu/docker-typecho
+```
 
-# 进入opt目录
-cd /opt
+选择一个目录用来安装 Typecho 和 Apache
 
-# Typecho blog template
-# 如果是需要迁移，可省略这一步，将原有/var/www/html目录下的文件复制到typecho文件夹下，手动修改config.inc.php即可
+```bash
+cd /var/www/blog
+```
+
+下载 Typecho 安装包，如果是迁移，就不用下载安装包，将原有目录放到`/opt/typecho`目录就可以了
+
+```bash
 wget http://typecho.org/downloads/1.1-17.10.30-release.tar.gz && \
 tar -zxvf 1.1-17.10.30-release.tar.gz && \
 mv build typecho && \
 rm 1.1-17.10.30-release.tar.gz -rf
-
-# Apache2 configuration
-docker run -d --name temp_typecho linkaliu/docker-typecho && \
-docker cp temp_typecho:/etc/apache2 apache2 && \
-docker rm temp_typecho -f
-
-# Setup
-# 兼容Debian系统，使用绝对路径/opt/typecho和/opt/apache2
-docker run -d --name typecho \
--p 80:80 -p 443:443 \
--v /opt/typecho:/var/www/html \
--v /opt/apache2:/etc/apache2 linkaliu/docker-typecho
 ```
 
-访问 **` http://<IP Address>:8080 `**
+启动一个临时容器，从容器内部提取 Apache 配置文件，并修改为自己的配置
+
+```bash
+docker run -d --name temp_typecho linkaliu/docker-typecho && \
+docker cp temp_typecho:/etc/apache2 . && \
+docker rm temp_typecho -f
+```
+
+启动容器
+
+```bash
+docker run -d --name typecho \
+-p 80:80 -p 443:443 \
+-v /var/www/blog/typecho:/var/www/html \
+-v /var/www/blog/apache2:/etc/apache2 linkaliu/docker-typecho
+```
+
+访问 **` http://<IP Address> `**，进行下一步操作
 
 ## 数据库连接
 
@@ -60,8 +73,6 @@ docker run -d --name typecho \
 2. 错误：*安装程序捕捉到以下错误: "SQLSTATE[HY000]: General error: 3161 Storage engine MyISAM is disabled (Table creation is disallowed).". 程序被终止, 请检查您的配置信息.*
 
    解决方案：因为mysql当前版本不支持MyISAM引擎，将**typecho/install/Mysql.sql**中的**MyISAM**修改为**INNODB**，刷新页面
-
-
 
 ## 其他问题
 
@@ -80,12 +91,12 @@ cp apache2/mods-available/rewrite.load apache2/mods-enabled/
 # 添加以下语句
 RewriteEngine On
 <Directory /var/www/html>
-	Options Indexes FollowSymLinks
-	AllowOverride All
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule ^(.*)$ index.php [L,E=PATH_INFO:$1]
-	Require all granted
+ Options Indexes FollowSymLinks
+ AllowOverride All
+ RewriteCond %{REQUEST_FILENAME} !-d
+ RewriteCond %{REQUEST_FILENAME} !-f
+ RewriteRule ^(.*)$ index.php [L,E=PATH_INFO:$1]
+ Require all granted
 </Directory>
 
 # 重启docker容器typecho
@@ -132,7 +143,7 @@ docker run -d --name typecho \
 ServerName www.example.com
 
 # 修改对应的key，使用自己的证书
-SSLCertificateFile	cert/5580757_blog.bilishare.com_public.crt
+SSLCertificateFile cert/5580757_blog.bilishare.com_public.crt
 SSLCertificateKeyFile cert/5580757_blog.bilishare.com.key
 SSLCertificateChainFile cert/5580757_blog.bilishare.com_chain.crt
 ```
