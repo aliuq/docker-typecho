@@ -159,3 +159,7 @@ cd /opt
 RewriteCond %{SERVER_PORT} !^443$
 RewriteRule ^/?(.*)$ https://%{SERVER_NAME}/$1 [L,R]
 ```
+
+## License
+
+[MIT](https://github.com/aliuq/docker-typecho/blob/main/LICENSE)
