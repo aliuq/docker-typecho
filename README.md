@@ -21,7 +21,7 @@ Docker 环境下安装部署 [Typecho](https://typecho.org/) 博客模板
 拉取镜像
 
 ```bash
-docker pull linkaliu/docker-typecho
+docker pull linkaliu/docker-typecho:7.4.16-apache
 ```
 
 选择一个目录用来安装 Typecho 和 Apache
@@ -30,33 +30,28 @@ docker pull linkaliu/docker-typecho
 cd /var/www/blog
 ```
 
-下载 Typecho 安装包，如果是迁移，就不用下载安装包，将原有目录放到`/opt/typecho`目录就可以了
-
-```bash
-wget http://typecho.org/downloads/1.1-17.10.30-release.tar.gz && \
-tar -zxvf 1.1-17.10.30-release.tar.gz && \
-mv build typecho && \
-rm 1.1-17.10.30-release.tar.gz -rf
-```
-
-启动一个临时容器，从容器内部提取 Apache 配置文件，并修改为自己的配置
-
-```bash
-docker run -d --name temp_typecho linkaliu/docker-typecho && \
-docker cp temp_typecho:/etc/apache2 . && \
-docker rm temp_typecho -f
-```
-
-启动容器
+快速使用
 
 ```bash
 docker run -d --name typecho \
 -p 80:80 -p 443:443 \
--v /var/www/blog/typecho:/var/www/html \
--v /var/www/blog/apache2:/etc/apache2 linkaliu/docker-typecho
+-v $PWD/typecho:/var/www/html \
+-v $PWD/apache2:/etc/apache2 linkaliu/docker-typecho:7.4.16-apache
 ```
 
-访问 **` http://<IP Address> `**，进行下一步操作
+默认安装的 Typecho 版本是1.1-17.10.30-release，你可以在启动容器后，将原有代码迁移到`$PWD/typecho`目录，然后重启容器`docker restart typecho`。**迁移时注意备份原有代码**
+
+如果当前目录下有`typecho`目录，则会覆盖掉内部的安装步骤，如果当前目录下有`apache2`目录，则会覆盖内部的 Apache2 配置文件。
+
+访问 **`http://<IP Address>`**，进行下一步操作
+
+删除容器
+
+```bash
+docker rm typecho -f
+```
+
+删除后重新启动容器，因为当前目录下，已经存在`typecho`和`apache2`目录，将不会执行安装步骤，仅会启动 server，如果需要重新执行安装步骤，请删除目录后`rm typecho apache2 -rf`重新启动容器。
 
 ## 数据库连接
 
