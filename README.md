@@ -69,7 +69,13 @@ docker rm typecho -f
 
    解决方案：因为mysql当前版本不支持MyISAM引擎，将**typecho/install/Mysql.sql**中的**MyISAM**修改为**INNODB**，刷新页面
 
-## 其他问题
+## 遇到的错误
+
++ `Error: statfs /app/typecho: no such file or directory`
+  
+  解决方案，手动创建目录，`mkdir $PWD/typecho $PWD/apache2`
+
+## 其他
 
 ### 地址重写，去掉index.php
 
