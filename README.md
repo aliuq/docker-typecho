@@ -2,6 +2,13 @@
 
 Docker 环境下安装部署 [Typecho](https://typecho.org/) 博客模板
 
+## 官方
+
+官方已经提供容器镜像
+
++ 仓库地址: <https://github.com/typecho/Dockerfile>
++ Docker Hub 地址: <https://hub.docker.com/r/joyqi/typecho>
+
 ## 容器环境
 
 + OS：Debian
